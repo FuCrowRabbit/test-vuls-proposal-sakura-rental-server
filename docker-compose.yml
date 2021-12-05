@@ -3,7 +3,6 @@ services:
   wordpress-cli:
     image: wordpress:cli
     tty: true
-    restart: always
     volumes:
       - ./public_html:/var/www/html
     working_dir: /var/www/html

@@ -6,7 +6,7 @@ https://github.com/FuCrowRabbit/vuls-proposal-sakura-rental-server/commit/f12b46
 
 This code should be used for testing purposes only.
 
-## Start Docker
+## 1. Start Docker
 
 ```bash
 docker-compose up
@@ -14,7 +14,7 @@ docker-compose up
 
 http://localhost:8080/
 
-## Create WordPress database
+## 2. Create WordPress database
 
 ```bash
 docker-compose run --rm wordpress-cli /bin/bash
@@ -25,7 +25,7 @@ Set admin password.
 
 > 2/3 [--admin_password=<password>]: PASSWORD
 
-## Run test
+## 3. Run test
 
 ### Before
 
@@ -35,7 +35,7 @@ and
 
 > sudo -u %s -i -- %s plugin list --path=%s --format=json --allow-root 2>/dev/null
 
-#### Bash Result
+#### Bash result
 
 ```bash
 docker-compose run --rm wordpress-cli /bin/bash
@@ -48,16 +48,16 @@ wp plugin list --path=/var/www/html --format=json --allow-root 2>/dev/null
 ###### Theme
 
 ```json
-[{"name":"twentynineteen","status":"inactive","update":"none","version":"2.1"},{"name":"twentytwenty","status":"inactive","update":"none","version":"1.8"},{"name":"twentytwentyone","status":"active","update":"none","version":"1.4"}]
+[{"name":"twentyfifteen","status":"inactive","update":"available","version":"1.9"},{"name":"twentyseventeen","status":"active","update":"available","version":"1.4"},{"name":"twentysixteen","status":"inactive","update":"available","version":"1.4"}]
 ```
 
 ###### Plugin
 
 ```json
-[{"name":"akismet","status":"inactive","update":"none","version":"4.1.12"},{"name":"hello","status":"inactive","update":"none","version":"1.7.2"}]
+[{"name":"akismet","status":"inactive","update":"none","version":"4.0.1"},{"name":"hello","status":"inactive","update":"available","version":"1.6"},{"name":"wp-multibyte-patch","status":"inactive","update":"none","version":"2.8.1"}]
 ```
 
-#### Csh Result
+#### Csh result
 
 ```csh
 docker-compose run --user root --rm wordpress-cli /bin/bash
@@ -75,20 +75,22 @@ wp plugin list --path=/var/www/html --format=json --allow-root 2>/dev/null
 Error: Too many positional arguments: 2
 ```
 
+---
+
 ### After
 
-> sudo -u %s -i -- %s theme list --path=%s --format=json --quiet --allow-root
+> ( sudo -u %s -i -- %s theme list --path=%s --format=json --allow-root > /dev/tty ) >& /dev/null
 
 and
 
-> sudo -u %s -i -- %s plugin list --path=%s --format=json --quiet --allow-root
+> ( sudo -u %s -i -- %s plugin list --path=%s --format=json --allow-root > /dev/tty ) >& /dev/null
 
-#### Bash Result
+#### Bash result
 
 ```bash
 docker-compose run --rm wordpress-cli /bin/bash
-wp theme list --path=/var/www/html --format=json --quiet --allow-root
-wp plugin list --path=/var/www/html --format=json --quiet --allow-root
+( wp theme list --path=/var/www/html --format=json --allow-root > /dev/tty ) >& /dev/null
+( wp plugin list --path=/var/www/html --format=json --allow-root > /dev/tty ) >& /dev/null
 ```
 
 ##### Output
@@ -96,23 +98,23 @@ wp plugin list --path=/var/www/html --format=json --quiet --allow-root
 ###### Theme
 
 ```json
-[{"name":"twentynineteen","status":"inactive","update":"none","version":"2.1"},{"name":"twentytwenty","status":"inactive","update":"none","version":"1.8"},{"name":"twentytwentyone","status":"active","update":"none","version":"1.4"}]
+[{"name":"twentyfifteen","status":"inactive","update":"available","version":"1.9"},{"name":"twentyseventeen","status":"active","update":"available","version":"1.4"},{"name":"twentysixteen","status":"inactive","update":"available","version":"1.4"}]
 ```
 
 ###### Plugin
 
 ```json
-[{"name":"akismet","status":"inactive","update":"none","version":"4.1.12"},{"name":"hello","status":"inactive","update":"none","version":"1.7.2"}]
+[{"name":"akismet","status":"inactive","update":"none","version":"4.0.1"},{"name":"hello","status":"inactive","update":"available","version":"1.6"},{"name":"wp-multibyte-patch","status":"inactive","update":"none","version":"2.8.1"}]
 ```
 
-#### Csh Result
+#### Csh result
 
 ```csh
 docker-compose run --user root --rm wordpress-cli /bin/bash
 apk add --update tcsh
 /bin/tcsh
-wp theme list --path=/var/www/html --format=json --quiet --allow-root
-wp plugin list --path=/var/www/html --format=json --quiet --allow-root
+( wp theme list --path=/var/www/html --format=json --allow-root > /dev/tty ) >& /dev/null
+( wp plugin list --path=/var/www/html --format=json --allow-root > /dev/tty ) >& /dev/null
 ```
 
 ##### Output
@@ -120,11 +122,38 @@ wp plugin list --path=/var/www/html --format=json --quiet --allow-root
 ###### Theme
 
 ```json
-[{"name":"twentynineteen","status":"inactive","update":"none","version":"2.1"},{"name":"twentytwenty","status":"inactive","update":"none","version":"1.8"},{"name":"twentytwentyone","status":"active","update":"none","version":"1.4"}]
+[{"name":"twentyfifteen","status":"inactive","update":"available","version":"1.9"},{"name":"twentyseventeen","status":"active","update":"available","version":"1.4"},{"name":"twentysixteen","status":"inactive","update":"available","version":"1.4"}]
 ```
 
 ###### Plugin
 
 ```json
-[{"name":"akismet","status":"inactive","update":"none","version":"4.1.12"},{"name":"hello","status":"inactive","update":"none","version":"1.7.2"}]
+[{"name":"akismet","status":"inactive","update":"none","version":"4.0.1"},{"name":"hello","status":"inactive","update":"available","version":"1.6"},{"name":"wp-multibyte-patch","status":"inactive","update":"none","version":"2.8.1"}]
+```
+
+#### In the case of Sudo
+
+```csh
+docker-compose run --user root --rm wordpress-cli /bin/bash
+apk add --update sudo
+( sudo -u root -E -- wp theme list --path=/var/www/html --format=json --allow-root > /dev/tty ) >& /dev/null
+( sudo -u root -E -- wp plugin list --path=/var/www/html --format=json --allow-root > /dev/tty ) >& /dev/null
+apk add --update tcsh
+/bin/tcsh
+( sudo -u root -E -- wp theme list --path=/var/www/html --format=json --allow-root > /dev/tty ) >& /dev/null
+( sudo -u root -E -- wp plugin list --path=/var/www/html --format=json --allow-root > /dev/tty ) >& /dev/null
+```
+
+##### Output
+
+###### Theme
+
+```json
+[{"name":"twentyfifteen","status":"inactive","update":"available","version":"1.9"},{"name":"twentyseventeen","status":"active","update":"available","version":"1.4"},{"name":"twentysixteen","status":"inactive","update":"available","version":"1.4"}]
+```
+
+###### Plugin
+
+```json
+[{"name":"akismet","status":"inactive","update":"none","version":"4.0.1"},{"name":"hello","status":"inactive","update":"available","version":"1.6"},{"name":"wp-multibyte-patch","status":"inactive","update":"none","version":"2.8.1"}]
 ```
